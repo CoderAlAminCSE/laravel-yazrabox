@@ -20,3 +20,5 @@ Route::get('/', function () {
 
 Route::get('users', [UserController::class, 'index'])->name('users.index');
 Route::get('users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+Route::get('users/export/excel', [UserController::class, 'export'])->name('users.export');
+Route::post('users/import/excel', [UserController::class, 'import'])->name('users.import');

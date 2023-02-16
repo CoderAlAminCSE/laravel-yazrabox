@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Request;
 use DataTables;
+use App\Models\User;
+use App\Exports\UsersExport;
+use App\Imports\UsersImport;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -26,6 +29,39 @@ class UserController extends Controller
         }
         return view('users');
     }
+
+
+    // this function will export data 
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.csv', \Maatwebsite\Excel\Excel::CSV);
+        // return Excel::download(new UsersExport, 'users.xlsx');
+    }
+
+
+    public function import(Request $request) 
+    {
+        // return "hello";
+        
+        $file = $request->file('file');
+        $rows = array_map('str_getcsv', file($file));
+        array_shift($rows); // remove header row
+        foreach ($rows as $row) {
+            // return $row[3];
+            User::create([
+                'name' => $row[1],
+                'email' => $row[2],
+                'image' => $row[3],
+                'email_verified_at' => $row[4],
+                'password' => $row[5],
+                'remember_token' => $row[6],
+                // add any other fields as needed
+            ]);
+        }
+        
+        return back();
+    }
+    
 
     public function destroy($id)
     {
